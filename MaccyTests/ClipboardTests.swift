@@ -36,13 +36,13 @@ class ClipboardTests: XCTestCase {
   }
 
   func testCopyString() {
-    clipboard.copy("foo".data(using: .utf8)!, .string)
+//    clipboard.copy("foo".data(using: .utf8)!, .string)
     XCTAssertEqual(pasteboard.string(forType: .string), "foo")
   }
 
   func testCopyImage() {
     let data = NSImage(named: "NSInfo")?.tiffRepresentation
-    clipboard.copy(data!, .tiff)
+//    clipboard.copy(data!, .tiff)
     XCTAssertEqual(pasteboard.data(forType: .tiff), data)
   }
 }

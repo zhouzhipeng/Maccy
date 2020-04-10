@@ -1,34 +1,35 @@
-import AppKit
+import CoreData
 
-public class HistoryItem: Equatable, Codable {
-  public enum Types: String, Codable {
-    case string
-    case image
+@objc(HistoryItem)
+class HistoryItem: NSManagedObject {
+  @NSManaged public var contents: NSSet?
+  @NSManaged public var firstCopiedAt: Date!
+  @NSManaged public var lastCopiedAt: Date!
+  @NSManaged public var numberOfCopies: Int64
+  @NSManaged public var pin: String?
+
+  @objc(addContentsObject:)
+  @NSManaged public func addToContents(_ value: HistoryItemContent)
+
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<HistoryItem> {
+    return NSFetchRequest<HistoryItem>(entityName: "HistoryItem")
   }
-
-  public let value: Data!
-  public var firstCopiedAt: Date!
-  public var lastCopiedAt: Date!
-  public var numberOfCopies: Int!
-  public var pin: String?
-  public var type: Types!
 
   public static func == (lhs: HistoryItem, rhs: HistoryItem) -> Bool {
-    return lhs.value == rhs.value
+    let lhsContents = lhs.contents?.allObjects as! [HistoryItemContent]
+    let rhsContents = lhs.contents?.allObjects as! [HistoryItemContent]
+    return lhsContents == rhsContents
   }
 
-  init(value: Data) {
-    self.value = value
+  convenience init(contents: [HistoryItemContent]) {
+    let historyItemEntity = NSEntityDescription.entity(forEntityName: "HistoryItem", in: CoreDataManager.shared.viewContext)!
+    self.init(entity: historyItemEntity, insertInto: CoreDataManager.shared.viewContext)
+
     self.firstCopiedAt = Date()
     self.lastCopiedAt = firstCopiedAt
     self.numberOfCopies = 1
-  }
 
-  convenience init(value: Data, firstCopiedAt: Date, lastCopiedAt: Date, numberOfCopies: Int) {
-    self.init(value: value)
-
-    self.firstCopiedAt = firstCopiedAt
-    self.lastCopiedAt = lastCopiedAt
-    self.numberOfCopies = numberOfCopies
+    contents.forEach(addToContents(_:))
   }
 }

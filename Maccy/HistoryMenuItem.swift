@@ -5,6 +5,7 @@ class HistoryMenuItem: NSMenuItem {
 
   public var isPinned = false
   public var item: HistoryItem!
+  public var value = ""
 
   private let showMaxLength = 50
   private let imageMaxWidth: CGFloat = 340.0
@@ -25,11 +26,11 @@ class HistoryMenuItem: NSMenuItem {
     self.onStateImage = NSImage(named: "PinImage")
     self.target = self
 
-    if item.type == .image {
-      loadImage(item)
-    } else {
-      loadString(item)
-    }
+//    if item.type == .image {
+//      loadImage(item)
+//    } else {
+//      loadString(item)
+//    }
 
     if let itemPin = item.pin {
       pin(itemPin)
@@ -57,38 +58,38 @@ class HistoryMenuItem: NSMenuItem {
     self.state = .off
   }
 
-  private func loadImage(_ item: HistoryItem) {
-    if let image = NSImage(data: item.value) {
-      if image.size.width > imageMaxWidth {
-        image.size.height = image.size.height / (image.size.width / imageMaxWidth)
-        image.size.width = imageMaxWidth
-      }
-
-      let imageMaxHeight = CGFloat(UserDefaults.standard.imageMaxHeight)
-      if image.size.height > imageMaxHeight {
-        image.size.width = image.size.width / (image.size.height / imageMaxHeight)
-        image.size.height = imageMaxHeight
-      }
-
-      self.image = image
-      self.toolTip = """
-                     Press ⌥+⌫ to delete.
-                     Press ⌥+p to (un)pin.
-                     """
-    }
-  }
-
-  private func loadString(_ item: HistoryItem) {
-    if let title = String(data: item.value, encoding: .utf8) {
-      self.title = humanizedTitle(title)
-      self.image = ColorImage.from(title)
-      self.toolTip = """
-                     \(title)\n \n
-                     Press ⌥+⌫ to delete.
-                     Press ⌥+p to (un)pin.
-                     """
-    }
-  }
+//  private func loadImage(_ item: HistoryItem) {
+//    if let image = NSImage(data: item.value) {
+//      if image.size.width > imageMaxWidth {
+//        image.size.height = image.size.height / (image.size.width / imageMaxWidth)
+//        image.size.width = imageMaxWidth
+//      }
+//
+//      let imageMaxHeight = CGFloat(UserDefaults.standard.imageMaxHeight)
+//      if image.size.height > imageMaxHeight {
+//        image.size.width = image.size.width / (image.size.height / imageMaxHeight)
+//        image.size.height = imageMaxHeight
+//      }
+//
+//      self.image = image
+//      self.toolTip = """
+//                     Press ⌥+⌫ to delete.
+//                     Press ⌥+p to (un)pin.
+//                     """
+//    }
+//  }
+//
+//  private func loadString(_ item: HistoryItem) {
+//    if let title = String(data: item.value, encoding: .utf8) {
+//      self.title = humanizedTitle(title)
+//      self.image = ColorImage.from(title)
+//      self.toolTip = """
+//                     \(title)\n \n
+//                     Press ⌥+⌫ to delete.
+//                     Press ⌥+p to (un)pin.
+//                     """
+//    }
+//  }
 
   private func humanizedTitle(_ title: String) -> String {
     let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)

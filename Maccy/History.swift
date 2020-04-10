@@ -2,14 +2,14 @@ import AppKit
 
 class History {
   public var all: [HistoryItem] {
-    get {
-      while UserDefaults.standard.storage.count > UserDefaults.standard.size {
-        UserDefaults.standard.storage.removeLast()
-      }
-      return UserDefaults.standard.storage
+    let fetchRequest = NSFetchRequest<HistoryItem>(entityName: "HistoryItem")
+    var items = try! CoreDataManager.shared.viewContext.fetch(fetchRequest)
+
+    while items.count > UserDefaults.standard.size {
+      remove(items.removeLast())
     }
 
-    set { UserDefaults.standard.storage = newValue }
+    return items
   }
 
   init() {
@@ -19,41 +19,35 @@ class History {
     }
   }
 
-  func add(_ item: HistoryItem) {
+  func add(_ typesWithData: [NSPasteboard.PasteboardType: Data]) {
     if UserDefaults.standard.ignoreEvents {
       return
     }
 
-    if item.type == .string, let string = String(data: item.value, encoding: .utf8) {
-      if string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-        return
-      }
-    }
+//    if item.type == .string, let string = String(data: item.value, encoding: .utf8) {
+//      if string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+//        return
+//      }
+//    }
 
     if let existingHistoryItem = all.first(where: { $0 == item }) {
-      existingHistoryItem.lastCopiedAt = Date()
-      existingHistoryItem.numberOfCopies += 1
-      update(existingHistoryItem)
-    } else {
-      if all.count == UserDefaults.standard.size {
-        all.removeLast()
-      }
-      all = [item] + all
+      item.firstCopiedAt = existingHistoryItem.firstCopiedAt
+      item.numberOfCopies += existingHistoryItem.numberOfCopies
+      existingHistoryItem.
+
+      remove(existingHistoryItem)
     }
   }
 
-  func update(_ item: HistoryItem) {
-    if let itemIndex = all.firstIndex(of: item) {
-      all.remove(at: itemIndex)
-      all.insert(item, at: itemIndex)
-    }
-  }
+//  func update(_ item: HistoryItem) {
+//    CoreDataManager.shared.saveContext()
+//  }
 
   func remove(_ item: HistoryItem) {
-    all.removeAll(where: { $0 == item })
+    CoreDataManager.shared.viewContext.delete(item)
   }
 
   func clear() {
-    all.removeAll()
+    all.forEach(remove(_:))
   }
 }

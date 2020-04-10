@@ -5,18 +5,18 @@ import XCTest
 class MenuTests: XCTestCase {
   let clipboard = Clipboard()
   let history = History()
-  let historyItems = [
-    HistoryItem(value: "foo".data(using: .utf8)!),
-    HistoryItem(value: "bar".data(using: .utf8)!),
-    HistoryItem(value: "baz".data(using: .utf8)!)
-  ]
+  let historyItems: [HistoryItem] = []
+//    HistoryItem(value: "foo".data(using: .utf8)!),
+//    HistoryItem(value: "bar".data(using: .utf8)!),
+//    HistoryItem(value: "baz".data(using: .utf8)!)
+//  ]
 
   var menu: Menu!
 
   override func setUp() {
     super.setUp()
 
-    history.all = historyItems
+//    history.all = historyItems
     menu = Menu(history: history, clipboard: clipboard)
     menu.addItem(NSMenuItem(title: "Search", action: nil, keyEquivalent: ""))
   }
