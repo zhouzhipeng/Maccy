@@ -86,9 +86,26 @@ class Clipboard {
           }
         } else {
           if let data = item.data(forType: .string) {
+            let title = String(data: data, encoding: .utf8)!
+            
             let historyItem = HistoryItem(value: data)
             historyItem.type = .string
             onNewCopyHooks.forEach({ $0(historyItem) })
+
+            // long型的timestamp 转为 Date string 放在顶部
+            if isTimeStamp(str: title){
+              let number: Double! = Double(title)
+
+              let dateStr: Data! = timeIntervalChangeToTimeStr(timeInterval: number, dateFormat: nil).data(using: .utf8)
+              let historyItem2 = HistoryItem(value: dateStr)
+              historyItem2.type = .string
+              onNewCopyHooks.forEach({ $0(historyItem2) })
+
+            }
+            
+            
+         
+            
           }
         }
       }
@@ -97,6 +114,34 @@ class Clipboard {
     changeCount = pasteboard.changeCount
   }
 
+  //时间戳转成字符串
+  func timeIntervalChangeToTimeStr(timeInterval:Double, dateFormat:String?) -> String {
+    let date:NSDate = NSDate.init(timeIntervalSince1970: timeInterval/1000)
+    let formatter = DateFormatter.init()
+    if dateFormat == nil {
+      formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    }else{
+      formatter.dateFormat = dateFormat
+    }
+    return formatter.string(from: date as Date)
+  }
+  
+
+  /// 手机号正则
+  ///
+  /// - Returns: true or false
+  func isTimeStamp(str:String)->Bool{
+
+    // - 1、创建规则
+    let pattern1 = "1[0-9]{12}"
+    // - 2、创建正则表达式对象
+    let regex1 = try! NSRegularExpression(pattern: pattern1, options: NSRegularExpression.Options.caseInsensitive)
+    // - 3、开始匹配
+    let res = regex1.matches(in: str, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, str.count)).count
+    return res==1
+
+  }
+  
   private func checkAccessibilityPermissions() {
     let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue(): true]
     AXIsProcessTrustedWithOptions(options)
